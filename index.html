@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Hamster Clicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>🌿 Green Hamster Clicker 🌿</h1>
+    <p>💰 Баланс: <span id="money">0</span></p>
+    <button id="click-button" onclick="game.earnMoney()">🐹 Клик (+<span id="click-power">1</span>)</button>
+
+    <h2>🏢 Бизнесы</h2>
+    <div id="business-container" class="business-grid"></div>
+
+    <h2>🤖 Бой с ХОМО-ботом</h2>
+    <button id="start-battle" onclick="pvpGame.startBattle()">🔥 Начать бой</button>
+
+    <div id="battle-container" style="display: none;">
+        <p>❤️ Твои очки здоровья: <span id="player-hp">100</span></p>
+        <p>🤖 Здоровье бота: <span id="bot-hp">100</span></p>
+        <div id="battle-log"></div> <!-- Лог боя -->
+
+        <div class="battle-buttons">
+            <button onclick="pvpGame.playerAttackAction()">⚔️ Атаковать</button>
+            <button onclick="pvpGame.biteAction()">🦷 Щелкнуть зубами</button>
+            <button onclick="pvpGame.clawAction()">🐾 Вытащить когти</button>
+            <button onclick="pvpGame.surrender()">🏳️ Сдаться</button>
+        </div>
+    </div>
+
+    <script>
+        const game = {
+            money: 0,
+            clickPower: 1,
+            businesses: [
+                { name: "Кафе «У Хомы»", price: 100, income: 10 },
+                { name: "Зоопарк Хомяков", price: 1000, income: 75 },
+                { name: "Хомячья качалка", price: 5000, income: 300 },
+                { name: "АЗС «Хомяк»", price: 10000, income: 500 },
+                { name: "Школа «Хома сапиенс»", price: 50000, income: 2000 },
+                { name: "Автосалон «На хомяке»", price: 100000, income: 3500 },
+                { name: "Игра «Hamster Combat»", price: 250000, income: 7500 }
+            ],
+
+            earnMoney: function() {
+                this.money += this.clickPower;
+                document.getElementById("money").textContent = this.money;
+            },
+
+            loadBusinesses: function() {
+                const container = document.getElementById("business-container");
+                container.innerHTML = "";
+                this.businesses.forEach((biz, index) => {
+                    const card = document.createElement("div");
+                    card.classList.add("business-card");
+                    card.innerHTML = `<h3>${biz.name}</h3>
+                                      <p>💰 Цена: ${biz.price}</p>
+                                      <p>📈 Доход: ${biz.income} / сек</p>
+                                      <button onclick="game.buyBusiness(${index})">Купить</button>`;
+                    container.appendChild(card);
+                });
+            },
+
+            buyBusiness: function(index) {
+                let biz = this.businesses[index];
+                if (this.money >= biz.price) {
+                    this.money -= biz.price;
+                    document.getElementById("money").textContent = this.money;
+                    setInterval(() => {
+                        this.money += biz.income;
+                        document.getElementById("money").textContent = this.money;
+                    }, 1000);
+                }
+            }
+        };
+
+        const pvpGame = {
+            player: { hp: 100, attack: 10, buffTeeth: false, buffClaws: false },
+            bot: { hp: 100, attack: 10, blockChance: 20 },
+            playerTurn: true,
+
+            startBattle: function() {
+                document.getElementById("battle-container").style.display = "block";
+                this.player.hp = 100;
+                this.bot.hp = 100;
+                this.player.buffTeeth = false;
+                this.player.buffClaws = false;
+                this.playerTurn = true;
+                this.updateUI();
+                document.getElementById("battle-log").innerHTML = "";
+            },
+
+            logAction: function(message) {
+                const log = document.getElementById("battle-log");
+                const p = document.createElement("p");
+                p.textContent = message;
+                log.appendChild(p);
+                log.scrollTop = log.scrollHeight;
+            },
+
+            playerAttackAction: function() {
+                if (!this.playerTurn) return;
+
+                if (Math.random() < 0.2) {
+                    this.logAction("😵 Хомяк упал!");
+                    this.playerTurn = false;
+                    setTimeout(() => this.botTurn(), 1000);
+                    return;
+                }
+
+                let damage = this.player.attack;
+                if (this.player.buffTeeth) damage += 5;
+
+                if (Math.random() * 100 > this.bot.blockChance) {
+                    this.bot.hp -= damage;
+                    this.logAction(`⚔️ Ты атаковал! Бот потерял ${damage} здоровья.`);
+                } else {
+                    this.logAction("🛡️ Бот заблокировал атаку!");
+                }
+
+                this.playerTurn = false;
+                this.checkBattleEnd();
+                if (this.bot.hp > 0) setTimeout(() => this.botTurn(), 1000);
+            },
+
+            biteAction: function() {
+                if (!this.playerTurn) return;
+
+                if (!this.player.buffTeeth) {
+                    this.player.buffTeeth = true;
+                    this.logAction("🦷 Ты щелкнул зубами, урон атаки увеличен!");
+                    this.playerTurn = false;
+                    setTimeout(() => this.botTurn(), 1000);
+                }
+            },
+
+            clawAction: function() {
+                if (!this.playerTurn) return;
+
+                if (!this.player.buffClaws) {
+                    this.player.buffClaws = true;
+                    this.bot.blockChance -= 10;
+                    this.logAction("🐾 Ты вытащил когти! Блок противника ослаблен.");
+                    this.playerTurn = false;
+                    setTimeout(() => this.botTurn(), 1000);
+                }
+            },
+
+            botTurn: function() {
+                let damage = this.bot.attack;
+                this.player.hp -= damage;
+                this.logAction(`🤖 Бот атаковал! Ты потерял ${damage} здоровья.`);
+                this.playerTurn = true;
+                this.checkBattleEnd();
+            },
+
+            surrender: function() {
+                this.logAction("😡 Хомяки не сдаются! Бой продолжается.");
+            },
+
+            checkBattleEnd: function() {
+                if (this.player.hp <= 0) {
+                    this.logAction("☠️ Ты проиграл!");
+                    setTimeout(() => {
+                        document.getElementById("battle-container").style.display = "none";
+                    }, 2000);
+                } else if (this.bot.hp <= 0) {
+                    this.logAction("🏆 Ты победил! Доход за клик увеличен!");
+                    game.clickPower *= 2;
+                    setTimeout(() => {
+                        document.getElementById("battle-container").style.display = "none";
+                    }, 2000);
+                }
+                this.updateUI();
+            },
+
+            updateUI: function() {
+                document.getElementById("player-hp").textContent = this.player.hp;
+                document.getElementById("bot-hp").textContent = this.bot.hp;
+            }
+        };
+
+        game.loadBusinesses();
+    </script>
+
+</body>
+</html>
