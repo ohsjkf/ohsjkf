@@ -1,0 +1,46 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
+#game-container {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.business-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.business-card {
+    border: 2px solid #333;
+    padding: 10px;
+    margin: 5px;
+    background-color: #fff;
+    width: 250px;
+    text-align: center;
+}
+
+#battle-container {
+    display: none;
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px auto;
+    width: 300px;
+    border: 2px solid #000;
+}
+
+.battle-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
