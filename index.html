@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Hamster Clicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>🌿 Green Hamster Clicker 🌿</h1>
+    <p>💰 Баланс: <span id="money">0</span></p>
+    <button id="click-button">🐹 Клик (+<span id="click-power">1</span>)</button>
+
+    <h2>🏢 Бизнесы</h2>
+    <div id="business-container"></div>
+
+    <h2>🤖 Бой с ХОМО-ботом</h2>
+    <button id="start-battle-button">🔥 Начать бой</button>
+
+    <div id="battle-container" style="display: none;">
+        <p>❤️ Твои очки здоровья: <span id="player-hp">100</span></p>
+        <p>🤖 Здоровье бота: <span id="bot-hp">100</span></p>
+        <div id="battle-log"></div>
+
+        <div class="battle-buttons">
+            <button id="attack-button">⚔️ Атаковать</button>
+            <button id="bite-button">🦷 Щелкнуть зубами</button>
+            <button id="claws-button">🐾 Вытащить когти</button>
+            <button id="surrender-button">🏳️ Сдаться</button>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+
+</body>
+</html>
